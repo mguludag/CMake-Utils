@@ -5,7 +5,7 @@ CMake files for find Qt, installing library with auto generated its CMake module
 ## find_qt usage
 
 *example CMakeLists.txt*
-```
+```cmake
 project(...
 
 ...
@@ -24,7 +24,7 @@ find_package(QT NAMES ...
 ## install_library usage
 
 *example CMakeLists.txt*
-```
+```cmake
 project(mylib VERSION 1.0 LANGUAGES CXX)
 
 set(INTERFACE interface/mylib_exports.hpp interface/mylib.hpp)
