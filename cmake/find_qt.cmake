@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 3.0)
+
+function(find_qt qt_version)
+if (NOT DEFINED ARGV1)
+    set(qt_root "C:/Qt")
+else()
+    set(qt_root "${ARGV1}")
+endif()
+
+if(DEFINED CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH_TEMP "${CMAKE_PREFIX_PATH}")
+endif()
+
+set(QT_FOUND OFF)
+
+set(curdir ${qt_root}/${qt_version})
+
+file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+set(dirlist "")
+foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+    list(APPEND dirlist ${child})
+    endif()
+endforeach()
+
+foreach(subdir ${dirlist})
+    string(TOLOWER ${subdir} _subdir)
+    if(${CMAKE_GENERATOR_PLATFORM} MATCHES "64")
+        if((${_subdir} MATCHES "msvc" OR ${_subdir} MATCHES "mingw" OR ${_subdir} MATCHES "gcc") 
+            AND ${_subdir} MATCHES "64")
+        set(CMAKE_PREFIX_PATH "${qt_root}/${qt_version}/${subdir}" PARENT_SCOPE)
+        set(QT_FOUND ON)
+        endif()
+    elseif(${CMAKE_GENERATOR_PLATFORM} MATCHES "86" OR ${CMAKE_GENERATOR_PLATFORM} MATCHES "32")
+        if((${_subdir} MATCHES "msvc" OR ${_subdir} MATCHES "mingw" OR ${_subdir} MATCHES "gcc") 
+            AND NOT ${_subdir} MATCHES "64")  
+            set(CMAKE_PREFIX_PATH "${qt_root}/${qt_version}/${subdir}" PARENT_SCOPE)
+            set(QT_FOUND ON)
+        endif()
+    endif()
+endforeach()
+
+if(NOT ${QT_FOUND})
+    message(SEND_ERROR  "No Qt found at " ${qt_root}/${qt_version})
+else()
+    message("Qt found at " ${qt_root}/${qt_version})
+endif()
+
+if(DEFINED CMAKE_PREFIX_PATH_TEMP)
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH_TEMP}" PARENT_SCOPE)
+endif()
+
+endfunction()
