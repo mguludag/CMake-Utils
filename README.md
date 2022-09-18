@@ -15,6 +15,7 @@ include(find_qt.cmake)
 find_qt(5.15.0) # default search path is C:/Qt
 # find_qt(6.3.2 D:/Qt) # changed search path to D:/Qt
 # find_qt(5) # selects latest Qt5 dir (example 5.15.0 and 5.15.2 this selects 5.15.2)
+# find_qt(D:/Qt) # selects latest version of Qt in D:/Qt
 # find_qt() # selects latest version of Qt
 
 find_package(QT NAMES ...
