@@ -46,4 +46,24 @@ install_library(NAME ${PROJECT_NAME}            # install target for library
                 INTERFACE_FILES INTERFACE       # interface headers variable
                 INTERFACE_INSTALL_DIR mylib     # interface target directory in final include folder (example: include/mylib)
                 NAMESPACE lib)                  # namespace for library (example: target_link_libraries(... lib::mylib ...))
+
+#
+# after installing final directory structure looks like for according this example:
+# mylib_1.0               # root library install dir
+# L  include
+# |   L  mylib
+# |       L   mylib_exports.hpp
+# |       L   mylib.hpp
+# L  lib
+#    L   mylib_x64
+#    |   L   cmake        # cmake files for find_package and target_link_libraries
+#    |   L   mylib1.dll
+#    |   L   mylib1d.dll
+#    |   
+#    L   mylib_x86
+#        L   cmake        # cmake files for find_package and target_link_libraries
+#        L   mylib1.dll
+#        L   mylib1d.dll
+#    
+# 
 ```
