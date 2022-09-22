@@ -33,14 +33,17 @@ project(mylib VERSION 1.0 LANGUAGES CXX)
 set(INTERFACE interface/mylib_exports.hpp interface/mylib.hpp)
 set(HEADERS detail/mylib_private.hpp)
 set(SOURCES detail/mylib.cpp detail/mylib_private.cpp)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install/${CMAKE_PROJECT_NAME}_${PROJECT_VERSION})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake) # this is for find this module (example this module in ${CMAKE_CURRENT_SOURCE_DIR}/cmake folder)
+include(install_library)
 
 add_library(${PROJECT_NAME} SHARED ${INTERFACE} ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE example_dependency)
 target_compile_definitions(${PROJECT_NAME} PRIVATE mylib_LIBRARY)
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install/${CMAKE_PROJECT_NAME}_${PROJECT_VERSION})
-set(INTERFACE_DIR interface)
-set(INTERFACE_INSTALL_DIR include/${PROJECT_NAME})
-set(NAMESPACE mylib)
-include(install_library.cmake)
+install_library(NAME ${PROJECT_NAME}            # install target for library
+                INTERFACE_DIR interface         # interface headers directory
+                INTERFACE_FILES INTERFACE       # interface headers variable
+                INTERFACE_INSTALL_DIR mylib     # interface target directory in final include folder (example: include/mylib)
+                NAMESPACE lib)                  # namespace for library (example: target_link_libraries(... lib::mylib ...))
 ```
