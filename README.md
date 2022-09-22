@@ -1,4 +1,4 @@
-# CMake-Utils
+# cmake-modules
 CMake files for find Qt, installing library with auto generated its CMake modules for find_package
 
 
@@ -66,4 +66,29 @@ install_library(NAME ${PROJECT_NAME}            # install target for library
 #        L   mylib1d.dll
 #    
 # 
+```
+
+## install_library usage
+
+```cmake
+project(mylib VERSION 1.0 LANGUAGES CXX)
+
+set(INTERFACE interface/mylib_exports.hpp interface/mylib.hpp)
+set(HEADERS detail/mylib_private.hpp)
+set(SOURCES detail/mylib.cpp detail/mylib_private.cpp)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake) # this is for find this module (example this module in ${CMAKE_CURRENT_SOURCE_DIR}/cmake folder)
+include(generate_rc)
+
+generate_rc(RC_FILE
+            NAME MyLib
+            VERSION ${PROJECT_VERSION}
+            COMPANY_NAME MyCompany
+            FILE_DESCRIPTION mylib library
+            )
+
+add_library(${PROJECT_NAME} SHARED ${INTERFACE} ${HEADERS} ${SOURCES} ${RC_FILE})
+target_link_libraries(${PROJECT_NAME} PRIVATE example_dependency)
+target_compile_definitions(${PROJECT_NAME} PRIVATE mylib_LIBRARY)
+
 ```
