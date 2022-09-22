@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
+include (CMakeParseArguments)
+
+
 
 # usage example:
 # project(mylib VERSION 1.0 LANGUAGES CXX)
@@ -6,30 +9,67 @@ cmake_minimum_required(VERSION 3.0)
 # set(INTERFACE interface/mylib_exports.hpp interface/mylib.hpp)
 # set(HEADERS detail/mylib_private.hpp)
 # set(SOURCES detail/mylib.cpp detail/mylib_private.cpp)
+# set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install/${CMAKE_PROJECT_NAME}_${PROJECT_VERSION})
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake) # this is for find this module (example this module in ${CMAKE_CURRENT_SOURCE_DIR}/cmake folder)
+# include(install_library)
 # 
 # add_library(${PROJECT_NAME} SHARED ${INTERFACE} ${HEADERS} ${SOURCES})
 # target_link_libraries(${PROJECT_NAME} PRIVATE example_dependency)
 # target_compile_definitions(${PROJECT_NAME} PRIVATE mylib_LIBRARY)
 # 
-# set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install/${CMAKE_PROJECT_NAME}_${PROJECT_VERSION})
-# set(INTERFACE_DIR interface)
-# set(INTERFACE_INSTALL_DIR include/${PROJECT_NAME})
-# set(NAMESPACE mylib)
-# include(install_library.cmake)
+# install_library(NAME ${PROJECT_NAME}            - install target for library
+#                 INTERFACE_DIR interface         - interface headers directory
+#                 INTERFACE_FILES INTERFACE       - interface headers variable
+#                 INTERFACE_INSTALL_DIR mylib     - interface target directory in final include folder (example: include/mylib)
+#                 NAMESPACE lib)                  - namespace for library (example: target_link_libraries(... lib::mylib ...))
+#
+#
+# after installing final directory structure looks like for according this example:
+# mylib_1.0               # root library install dir
+# L  include
+# |   L  mylib
+# |       L   mylib_exports.hpp
+# |       L   mylib.hpp
+# L  lib
+#    L   mylib_x64
+#    |   L   cmake        # cmake files for find_package and target_link_libraries
+#    |   L   mylib1.dll
+#    |   L   mylib1d.dll
+#    |   
+#    L   mylib_x86
+#        L   cmake        # cmake files for find_package and target_link_libraries
+#        L   mylib1.dll
+#        L   mylib1d.dll
+#    
+# 
 
-if (NOT DEFINED INTERFACE_DIR OR INTERFACE_DIR STREQUAL "")
-    set(INCLUDE_DIR "" CACHE PATH "" FORCE)
+function(install_library)
+set (options)
+set (oneValueArgs
+    NAME
+    INTERFACE_FILES
+    INTERFACE_DIR
+    INTERFACE_INSTALL_DIR
+    NAMESPACE
+    )
+set (multiValueArgs)
+cmake_parse_arguments(PROJECT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME}${PROJECT_VERSION_MAJOR})
+
+if (NOT DEFINED PROJECT_INTERFACE_DIR OR PROJECT_INTERFACE_DIR STREQUAL "")
+    set(PROJECT_INTERFACE_DIR "interface" CACHE PATH "" FORCE)
 endif()
 
-if (NOT DEFINED INTERFACE_INSTALL_DIR OR INTERFACE_INSTALL_DIR STREQUAL "")
-    set(INTERFACE_INSTALL_DIR "include" CACHE PATH "" FORCE)
+if (NOT DEFINED PROJECT_INTERFACE_INSTALL_DIR OR PROJECT_INTERFACE_INSTALL_DIR STREQUAL "")
+    set(PROJECT_INTERFACE_INSTALL_DIR "include" CACHE PATH "" FORCE)
 endif()
 
 
-if (NOT DEFINED NAMESPACE OR NAMESPACE STREQUAL "")
-    set(NAMESPACE "" CACHE PATH "" FORCE)
+if (NOT DEFINED PROJECT_NAMESPACE OR PROJECT_NAMESPACE STREQUAL "")
+    set(PROJECT_NAMESPACE "" CACHE PATH "" FORCE)
 else()
-    set(NAMESPACE ${NAMESPACE}::)
+    set(PROJECT_NAMESPACE ${PROJECT_NAMESPACE}::)
 endif()
 
 
@@ -46,7 +86,7 @@ set(INTERFACE_INCLUDE_DIR "include")
 
 # binding interface and library
 target_include_directories(${PROJECT_NAME}
-    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${INTERFACE_DIR};${CMAKE_CURRENT_BINARY_DIR}>"
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR}>"
     INTERFACE $<INSTALL_INTERFACE:${INTERFACE_INCLUDE_DIR}>
 )
 
@@ -54,9 +94,10 @@ target_include_directories(${PROJECT_NAME}
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}_TARGETS DESTINATION ${LIB_INSTALL_DIR})
 
 # preserve interface dir structure
-foreach(_HEADER ${INTERFACE})
+foreach(_HEADER ${${PROJECT_INTERFACE_FILES}})
     get_filename_component(_DIR ${_HEADER} PATH)
-    install(FILES ${_HEADER} DESTINATION "${INTERFACE_INSTALL_DIR}/${_DIR}")
+    string(REPLACE "${PROJECT_INTERFACE_DIR}/" "" NEW_DIR ${_DIR})
+    install(FILES ${_HEADER} DESTINATION "${PROJECT_INTERFACE_INSTALL_DIR}/${NEW_DIR}")
 endforeach(_HEADER)
 
 # create cmake-config files
@@ -105,6 +146,9 @@ install(
   EXPORT ${PROJECT_NAME}_TARGETS
   FILE ${PROJECT_NAME}-targets.cmake
   NAMESPACE
-  ${NAMESPACE}
+  ${PROJECT_NAMESPACE}
   DESTINATION ${CMAKE_INSTALL_DIR}
   )
+
+  
+endfunction(install_library)
