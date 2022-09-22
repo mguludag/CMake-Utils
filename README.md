@@ -68,7 +68,7 @@ install_library(NAME ${PROJECT_NAME}            # install target for library
 # 
 ```
 
-## install_library usage
+## generate_rc usage
 
 ```cmake
 project(mylib VERSION 1.0 LANGUAGES CXX)
