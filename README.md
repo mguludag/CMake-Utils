@@ -97,7 +97,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE mylib_LIBRARY)
 
 *example CMakeLists.txt*
 ```cmake
-project(mylib VERSION 1.0 LANGUAGES CXX)
+project(myexe VERSION 1.0 LANGUAGES CXX)
 
 set(SOURCES main.cpp)
 set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install/${CMAKE_PROJECT_NAME}_${PROJECT_VERSION})
