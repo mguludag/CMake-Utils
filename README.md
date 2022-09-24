@@ -92,3 +92,23 @@ target_link_libraries(${PROJECT_NAME} PRIVATE example_dependency)
 target_compile_definitions(${PROJECT_NAME} PRIVATE mylib_LIBRARY)
 
 ```
+
+## install_linked_libraries usage
+
+*example CMakeLists.txt*
+```cmake
+project(mylib VERSION 1.0 LANGUAGES CXX)
+
+set(SOURCES main.cpp)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install/${CMAKE_PROJECT_NAME}_${PROJECT_VERSION})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake) # this is for find this module (example this module in ${CMAKE_CURRENT_SOURCE_DIR}/cmake folder)
+include(install_linked_libraries)
+
+add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} PRIVATE example_dependency)
+
+# this function copies all linked libraries from target_link_libraries (if you link any Qt library, this will install all Qt dependencies incl. qml and plugins)
+install_linked_libraries() #this function should call after add_executable or add_library
+
+
+```
