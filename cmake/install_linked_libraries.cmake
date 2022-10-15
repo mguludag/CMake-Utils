@@ -7,9 +7,9 @@ function(install_linked_libraries)
       set(install_target ${PROJECT_NAME})
     endif()
 
-    if(${CMAKE_GENERATOR_PLATFORM} MATCHES "86" OR ${CMAKE_GENERATOR_PLATFORM} MATCHES "32")
+    if(CMAKE_GENERATOR_PLATFORM MATCHES "86" OR CMAKE_GENERATOR_PLATFORM MATCHES "32")
       set(TARGET_ARCH "")
-    else(${CMAKE_GENERATOR_PLATFORM} MATCHES "64")
+    else(CMAKE_GENERATOR_PLATFORM MATCHES "64")
       set(TARGET_ARCH "64")
     endif()
 
