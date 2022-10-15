@@ -124,7 +124,7 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config
   PATH_VARS INTERFACE_INCLUDE_DIR)
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}-configversion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
   VERSION ${${PROJECT_NAME}_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
@@ -137,7 +137,7 @@ export(EXPORT ${PROJECT_NAME}_TARGETS
 install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}-configversion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
   DESTINATION
     ${CMAKE_INSTALL_DIR}
 )
